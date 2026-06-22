@@ -9,9 +9,17 @@ h1 {
   margin-top: 20px;
 }
 
+.modes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
 .top {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 20px;
   font-size: 20px;
@@ -48,6 +56,15 @@ button:hover {
   top: 180px;
   font-size: 40px;
   transition: 0.08s;
+  z-index: 2;
+}
+
+#bot {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  font-size: 40px;
+  z-index: 2;
 }
 
 .coin {
@@ -85,4 +102,19 @@ button:hover {
 
 .hint {
   color: #555;
+}
+
+.rivals-mode {
+  background: #ff7675 !important;
+  border-color: #d63031 !important;
+}
+
+.survival-mode {
+  background: #636e72 !important;
+  border-color: #2d3436 !important;
+}
+
+.world-mode {
+  background: #7bed9f !important;
+  border-color: #2ed573 !important;
 }
