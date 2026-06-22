@@ -90,9 +90,11 @@ function buyItem(itemName, price) {
   }
 }
 
-function fakePayment(itemEmoji) {
-  alert("Пока это демо. Настоящую оплату подключим позже.");
-  player.textContent = itemEmoji;
+function buyCrown() {
+  window.open(
+    "https://buy.stripe.com/test_6oUaEW45qeGubeG7dxcjS00",
+    "_blank"
+  );
 }
 
 function resetGame() {
