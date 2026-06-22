@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini World Shop</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Mini World Shop</h1>
+
+  <div class="top">
+    <div>Монеты: <span id="coins">0</span></div>
+    <button onclick="openShop()">Магазин</button>
+    <button onclick="resetGame()">Сброс</button>
+  </div>
+
+  <div id="game">
+    <div id="player">🙂</div>
+  </div>
+
+  <div id="shop" class="hidden">
+    <h2>Магазин вещей</h2>
+
+    <div class="item">
+      <b>Синяя кепка</b>
+      <p>Бесплатно: 20 монет</p>
+      <button onclick="buyItem('cap', 20)">Купить</button>
+    </div>
+
+    <div class="item premium">
+      <b>Золотая корона</b>
+      <p>Премиум: 1.99 €</p>
+      <button onclick="fakePayment('👑')">Купить за деньги</button>
+    </div>
+
+    <div class="item premium">
+      <b>Неоновый питомец</b>
+      <p>Премиум: 2.99 €</p>
+      <button onclick="fakePayment('🐉')">Купить за деньги</button>
+    </div>
+
+    <button onclick="closeShop()">Закрыть</button>
+  </div>
+
+  <p class="hint">
+    Управление: стрелки на клавиатуре. Собирай монетки и покупай вещи.
+  </p>
+
+  <script src="game.js"></script>
+</body>
+</html>
