@@ -2,6 +2,10 @@ const player = document.getElementById("player");
 const game = document.getElementById("game");
 const coinsText = document.getElementById("coins");
 const shop = document.getElementById("shop");
+const supabaseClient = window.supabase.createClient(
+  "https://lxaevejpohmkkusbjobg.supabase.co",
+  "sb_publishable_mlX7HkRy6pxtNcRPo95iTw_ipHQ7sRH"
+);
 
 let x = 280;
 let y = 180;
