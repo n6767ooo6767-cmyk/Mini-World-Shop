@@ -1,22 +1,97 @@
+
+const SUPABASE_URL = "https://lxaevejpohmkkusbjobg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mlX7HkRy6pxtNcRPo95iTw_ipHQ7sRH";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const player = document.getElementById("player");
 const game = document.getElementById("game");
 const coinsText = document.getElementById("coins");
 const shop = document.getElementById("shop");
-const supabaseClient = window.supabase.createClient(
-  "https://lxaevejpohmkkusbjobg.supabase.co",
-  "sb_publishable_mlX7HkRy6pxtNcRPo95iTw_ipHQ7sRH"
-);
 
 let x = 280;
 let y = 180;
-let coins = Number(localStorage.getItem("coins")) || 0;
-let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+let coins = 0;
+let inventory = [];
+let playerEmail = localStorage.getItem("playerEmail");
 
-coinsText.textContent = coins;
+async function startGame() {
+  if (!playerEmail) {
+    playerEmail = prompt("Введите email игрока:");
+    if (!playerEmail) {
+      alert("Без email игра будет работать только на этом устройстве.");
+      playerEmail = "guest_" + Date.now() + "@game.local";
+    }
+    localStorage.setItem("playerEmail", playerEmail);
+  }
 
-function saveGame() {
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("inventory", JSON.stringify(inventory));
+  await loadPlayer();
+  coinsText.textContent = coins;
+
+  for (let i = 0; i < 8; i++) {
+    createCoin();
+  }
+
+  applyInventory();
+}
+
+async function loadPlayer() {
+  const { data, error } = await supabaseClient
+    .from("players")
+    .select("*")
+    .eq("email", playerEmail)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    alert("Ошибка загрузки игрока из Supabase.");
+    return;
+  }
+
+  if (!data) {
+    const { error: insertError } = await supabaseClient
+      .from("players")
+      .insert({
+        email: playerEmail,
+        coins: 0,
+        crown: false,
+        pet: false
+      });
+
+    if (insertError) {
+      console.error(insertError);
+      alert("Ошибка создания игрока.");
+      return;
+    }
+
+    coins = 0;
+    inventory = [];
+  } else {
+    coins = data.coins || 0;
+    inventory = [];
+
+    if (data.crown) inventory.push("crown");
+    if (data.pet) inventory.push("pet");
+  }
+}
+
+async function savePlayer() {
+  const hasCrown = inventory.includes("crown");
+  const hasPet = inventory.includes("pet");
+
+  const { error } = await supabaseClient
+    .from("players")
+    .update({
+      coins: coins,
+      crown: hasCrown,
+      pet: hasPet
+    })
+    .eq("email", playerEmail);
+
+  if (error) {
+    console.error(error);
+    alert("Ошибка сохранения игрока.");
+  }
 }
 
 function movePlayer() {
@@ -24,7 +99,7 @@ function movePlayer() {
   player.style.top = y + "px";
 }
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", async function(event) {
   const speed = 15;
 
   if (event.key === "ArrowUp" && y > 0) y -= speed;
@@ -33,7 +108,7 @@ document.addEventListener("keydown", function(event) {
   if (event.key === "ArrowRight" && x < 550) x += speed;
 
   movePlayer();
-  checkCoins();
+  await checkCoins();
 });
 
 function createCoin() {
@@ -47,10 +122,10 @@ function createCoin() {
   game.appendChild(coin);
 }
 
-function checkCoins() {
+async function checkCoins() {
   const coinElements = document.querySelectorAll(".coin");
 
-  coinElements.forEach((coin) => {
+  for (const coin of coinElements) {
     const coinX = parseInt(coin.style.left);
     const coinY = parseInt(coin.style.top);
 
@@ -58,10 +133,10 @@ function checkCoins() {
       coin.remove();
       coins += 1;
       coinsText.textContent = coins;
-      saveGame();
       createCoin();
+      await savePlayer();
     }
-  });
+  }
 }
 
 function openShop() {
@@ -72,26 +147,25 @@ function closeShop() {
   shop.classList.add("hidden");
 }
 
-function buyItem(itemName, price) {
+async function buyItem(itemName, price) {
   if (inventory.includes(itemName)) {
     alert("Эта вещь уже куплена!");
     return;
   }
 
-  if (coins >= price) {
-    coins -= price;
-    inventory.push(itemName);
-    coinsText.textContent = coins;
-    saveGame();
-
-    if (itemName === "cap") {
-      player.textContent = "🧢";
-    }
-
-    alert("Покупка успешна!");
-  } else {
+  if (coins < price) {
     alert("Не хватает монет!");
+    return;
   }
+
+  coins -= price;
+  inventory.push(itemName);
+  coinsText.textContent = coins;
+
+  applyInventory();
+  await savePlayer();
+
+  alert("Покупка успешна!");
 }
 
 function buyCrown() {
@@ -101,15 +175,27 @@ function buyCrown() {
   );
 }
 
-function resetGame() {
+function applyInventory() {
+  if (inventory.includes("crown")) {
+    player.textContent = "👑";
+  } else if (inventory.includes("pet")) {
+    player.textContent = "🐉";
+  } else {
+    player.textContent = "🙂";
+  }
+}
+
+async function resetGame() {
   localStorage.clear();
+
+  if (playerEmail) {
+    await supabaseClient
+      .from("players")
+      .delete()
+      .eq("email", playerEmail);
+  }
+
   location.reload();
 }
 
-for (let i = 0; i < 8; i++) {
-  createCoin();
-}
-
-if (inventory.includes("cap")) {
-  player.textContent = "🧢";
-}
+startGame();
