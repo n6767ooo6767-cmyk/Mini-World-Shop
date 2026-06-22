@@ -8,14 +8,23 @@
 <body>
   <h1>Mini World Shop</h1>
 
+  <div class="modes">
+    <button onclick="setMode('world')">🏡 Обычный мир</button>
+    <button onclick="setMode('rivals')">⚔️ Rivals</button>
+    <button onclick="setMode('survival')">☠️ Выживание</button>
+  </div>
+
   <div class="top">
+    <div>Режим: <span id="modeName">Обычный мир</span></div>
     <div>Монеты: <span id="coins">0</span></div>
+    <div>HP: <span id="hp">100</span></div>
     <button onclick="openShop()">Магазин</button>
     <button onclick="resetGame()">Сброс</button>
   </div>
 
   <div id="game">
     <div id="player">🙂</div>
+    <div id="bot" class="hidden">🤖</div>
   </div>
 
   <div id="shop" class="hidden">
@@ -29,10 +38,9 @@
 
     <div class="item premium">
       <b>Золотая корона</b>
-      <p>Премиум: 1.99 €</p>
-      <button onclick="buyCrown()">
-  Купить за 1.99 €
-</button>
+      <p>Премиум: 1.99 € — даёт x2 монеты</p>
+      <button onclick="buyCrown()">Купить за 1.99 €</button>
+    </div>
 
     <div class="item premium">
       <b>Неоновый питомец</b>
@@ -44,10 +52,10 @@
   </div>
 
   <p class="hint">
-    Управление: стрелки на клавиатуре. Собирай монетки и покупай вещи.
+    Стрелки — движение. Пробел — удар в Rivals/Выживании.
   </p>
-    
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="game.js"></script>
 </body>
 </html>
